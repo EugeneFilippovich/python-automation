@@ -11,4 +11,4 @@ def current_files():
     pprint.pprint(files_with_path)
     return current_files
 
-current_files() 1
+current_files()
