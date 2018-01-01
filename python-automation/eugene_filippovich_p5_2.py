@@ -17,4 +17,4 @@ text = """Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmo
     deserunt mollit anim id est laborum."""
 
 text = re.sub(r'\b\w*\b', replace, text, flags=re.I|re.U)
-print(text)
+print(text) 
