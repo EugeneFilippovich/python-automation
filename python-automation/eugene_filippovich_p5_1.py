@@ -1,14 +1,13 @@
 import os
-import pprint
 
-def current_files():
-    files_with_path = []
-    path = "F:/Test"
-    for root, dirs, files in os.walk(path):
+
+def current_files(path):
+    for root, dirs, files in path:
         for f in files:
-            f = os.path.join(root, f)
-            files_with_path.append(f)
-    pprint.pprint(files_with_path)
-    return current_files
+            yield os.path.join(root, f)
 
-current_files()
+
+generator = current_files(os.walk("C:/"))
+
+for _ in generator:
+    print _
