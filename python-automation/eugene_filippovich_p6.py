@@ -19,6 +19,6 @@ class Car:
 
 class RedCar (Car):
     red_car = Car(driving_wheels=4, spare_wheels=0, total_wheels=4, color="Red")
-    print (red_car.driving_wheels, red_car.spare_wheels, red_car.total_wheels, red_car.color)
+    print (red_car.driving_wheels, red_car.spare_wheels, red_car.total_wheels, red_car.color) 
 
 
