@@ -1,65 +1,26 @@
-def arange(*args, **kwargs):
-    if len(args) + len(kwargs) > 3:
-        return
-    if len(args) == 1:
-        if len(kwargs) == 0:
-            current = 0
-            stop = int(args[0])
-            step = 1
-        elif len(kwargs) == 1:
-            current = int(args[0])
-            stop = int(kwargs["stop"])
-            step = 1
-        elif len(kwargs) == 2:
-            current = int(args[0])
-            stop = int(kwargs["stop"])
-            step = int(kwargs["step"])
-    elif len(args) == 2:
-        if len(kwargs) == 0:
-            current = int(args[0])
-            stop = int(args[1])
-            step = 1
-        elif len(kwargs) == 1:
-            current = args[0]
-            stop = int(args[1])
-            step = int(kwargs["step"])
-    elif len(args) == 3:
-        current = int(args[0])
-        stop = int(args[1])
-        step = int(args[2])
-    elif len(args) == 0:
-        if len(kwargs) == 1:
-            current = 0
-            stop = int(kwargs["stop"])
-            step = 1
-        elif len(kwargs) == 2:
-            current = 0
-            stop = int(kwargs["stop"])
-            step = 1
-        elif len(kwargs) == 3:
-            current = int(kwargs["start"])
-            stop = int(kwargs["stop"])
-            step = int(kwargs["step"])
-    else:
-        return
-    if stop < current and step > 0:
-        return
-    if stop > current and step < 0:
-        return
-    if step == 0:
-        return
-    if step > 0:
-        yield current
-        current += step
-        while current < stop:
-            yield current
-            current += step
-    else:
-        yield current
-        current += step
-        while current > stop:
-            yield current
-            current += step
+class Car(object):
+    wheels = None
+    car_id = 1
 
-gen = arange(start=1, stop=8, step=2)
-print(list(gen))
+    def __init__(self, wheels=4, spare=1, color="Black"):
+        print("Creating new car {}".format(id(self)))
+        self.id = Car.car_id
+        self.wheels = wheels
+        self.spare = spare
+        self.color = color
+        Car.car_id += 1
+
+    def diag(self):
+        print (self.wheels, self.spare, self.color)
+
+
+black_car = Car()
+red_car = Car(spare=0, color="Red")
+
+# black_car.diag()
+# red_car.diag()
+
+print(black_car.id, black_car.wheels, black_car.spare, black_car.color)
+print(red_car.id, red_car.wheels, red_car.spare, red_car.color)
+
+
