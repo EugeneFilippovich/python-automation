@@ -8,7 +8,6 @@ class Car:
         self.spare_wheels = spare_wheels
         self.color = color
 
-
     def diag(self):
         print (self.driving_wheels, self.spare_wheels, self.color)
 
