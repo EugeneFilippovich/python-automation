@@ -27,7 +27,7 @@ class Diesel(CarProduce):
         self.repair_cost = 750
         self.fuel_consumption = 6
 
-[Petrol() for x in xrange(1, 100, 2)]
+[Petrol() for x in xrange(1, 100,2)]
 
 #
 #
