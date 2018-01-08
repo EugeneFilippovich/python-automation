@@ -1,8 +1,9 @@
 import random
-
+import struct
 
 class CarProduce(object):
     car_id = 1
+    fuel_consumption = None
 
     def __init__(self):
         print("Creating new car {}".format(id(self)))
@@ -11,7 +12,9 @@ class CarProduce(object):
         self.start_price = 10000
         self.gas_tank = 60
         self.total_mileage = 0
-        self.fuel_consumption = 0
+        self.fuel_consumption = CarProduce.fuel_consumption
+        self.gas_gallons = 0
+        self.mileage_to_drive = random.randint(55000, 286000)
 
 
 class Petrol(CarProduce):
@@ -42,17 +45,20 @@ for i in xrange(0, 100):
     else:
         cars.append(Petrol(gas_tank))
 
+
 print(cars)
 for i in xrange(0, 100):
     print(cars[i].__dict__)
 
+# var = cars[0].__dict__['repair_cost']
+# print(var)
 
-# def overhaul():
-#     mileage_to_drive = random.randint(55000, 286000)
-#     point_a = 0
-#     point_b = mileage_to_drive
-#     gas_gallons = ((point_b - point_a))
-#     print(gas_gallons)
-#
-# overhaul()
+
+def overhaul():
+    gas_gallons = (cars[0].__dict__['mileage_to_drive'] / (cars[0].__dict__['fuel_consumption']
+                   * cars[0].__dict__['gas_tank']))
+
+    print("{} gallons are needed".format(gas_gallons))
+
+overhaul()
 
