@@ -45,20 +45,11 @@ for i in xrange(0, 100):
     else:
         cars.append(Petrol(gas_tank))
 
+gallons = []
+for i in xrange(0, 100):
+    gallons.append(cars[i].__dict__['mileage_to_drive'] / (cars[i].__dict__['fuel_consumption']
+                   * cars[i].__dict__['gas_tank']))
+    cars[i].__dict__['gas_gallons'] = gallons[i]
 
-print(cars)
 for i in xrange(0, 100):
     print(cars[i].__dict__)
-
-# var = cars[0].__dict__['repair_cost']
-# print(var)
-
-
-def overhaul():
-    gas_gallons = (cars[0].__dict__['mileage_to_drive'] / (cars[0].__dict__['fuel_consumption']
-                   * cars[0].__dict__['gas_tank']))
-
-    print("{} gallons are needed".format(gas_gallons))
-
-overhaul()
-
