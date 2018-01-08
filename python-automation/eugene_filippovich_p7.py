@@ -33,7 +33,6 @@ class Diesel(CarProduce):
         self.fuel_consumption = 6
         self.gas_tank = gas_tank
 
-
 cars = []
 
 for i in xrange(0, 100):
