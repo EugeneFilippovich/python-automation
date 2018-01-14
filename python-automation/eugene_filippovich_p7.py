@@ -42,7 +42,7 @@ class CarFactory(object):
 
         @property
         def total_mileage(self):
-            return self.total_mileage
+            return self._total_mileage
 
     def mileage_increase(self, distance=0):
         if distance > 0:
@@ -76,10 +76,6 @@ class DieselCarProduce(CarFactory):
         self.gas_tank = gas_tank
         self.reduce_price = 10.5
         self.fuel = 'DIESEL'
-
-        # def info(self):
-        #     print('DIESEL', self.__dict__)
-
 
 cars = []
 
@@ -134,7 +130,6 @@ for i in xrange(0, len(cars)):
         cars[i].start_price -= (
         (cars[i].fuel_consumption * FuelPrice.__dict__[cars[i].fuel] * DISTANCE / 100) + cars[i].reduce_price)
         cars[i].fuel_consumption += cars[i].fuel_consumption * FUEL_CONSUMPTION_INCREASE
-        #
         if cars[i].start_price <= 0:
             cars[i].total_credit += (cars[i].start_price * (-1) + CarServicePrice.ENGINE_REPLACE)
         total_credit_to_pay += cars[i].total_credit
@@ -143,11 +138,11 @@ for i in xrange(0, len(cars)):
         cars[i].mileage_before_util = cars[i].start_price / FuelPrice.__dict__[cars[i].fuel] if (cars[i].start_price >= 0) else 0
 
 for i in xrange(0, TOTAL_CARS_COUNT):
-    # print("Car's id: {}, total mileage: {}, final price: {}, money spent for fuel: {}, total gas gallons used: {}, "
-    #       "mileage before utilization: {} ".format(cars[i].car_id, cars[i].total_mileage, cars[i].start_price,
-    #                                                cars[i].total_fuel_cost, cars[i].gas_gallons_used,
-    #                                                cars[i].mileage_before_util))
-    print(cars[i].__dict__, "fuel price: " + str(FuelPrice.__dict__[cars[i].fuel]))
+    print("Car's id: {}, total mileage: {}, final price: {}, money spent for fuel: {}, total gas gallons used: {}, "
+          "mileage before utilization: {} ".format(cars[i].car_id, cars[i].total_mileage, cars[i].start_price,
+                                                   cars[i].total_fuel_cost, cars[i].gas_gallons_used,
+                                                   cars[i].mileage_before_util))
+    # print(cars[i].__dict__, "fuel price: " + str(FuelPrice.__dict__[cars[i].fuel]))
 
 print('Total credit to pay = ' + str(total_credit_to_pay))
 
