@@ -155,7 +155,3 @@ cars = CarFactory.cars
 car_produce.get_statistic()
 
 print('Total credit to pay = ' + str(car_produce.total_credit_to_pay))
-
-# car1 = CarProduce()
-#
-# car1.info()
