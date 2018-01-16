@@ -3,10 +3,6 @@ class Store(object):
 
 passed = ['Banana', 'Apple', 'Pizza']
 
-grocery_items_list = []
-
-hardware_items_list = []
-
 
 class GroceryStore(Store):
     goods_list = []
@@ -42,7 +38,6 @@ class Goods(object):
     freezed = False
 
     def __init__(self, price):
-        # self.discount_percentage = discount_percentage
         if price > 0:
             self.price = price
         else:
@@ -53,7 +48,7 @@ class Goods(object):
         return self.price
 
     def set_price(self, price):
-        if self.freezed == False:
+        if not self.freezed:
             self.price = price
         else:
             raise Exception("Price can't be changed")
@@ -62,7 +57,7 @@ class Goods(object):
         self.freezed = is_freezed
 
     def set_discount(self, discount_percentage):
-        if self.freezed == False:
+        if not self.freezed:
             self.discount_percentage = discount_percentage
             print("Discount percentage is : {}% ".format(discount_percentage))
         else:
