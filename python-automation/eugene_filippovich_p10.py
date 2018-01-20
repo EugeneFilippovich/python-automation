@@ -1,4 +1,5 @@
 from operator import attrgetter
+import logging
 
 
 class Bouquet(object):
