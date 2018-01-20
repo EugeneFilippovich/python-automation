@@ -1,7 +1,4 @@
 from operator import attrgetter
-#
-import logging
-
 
 
 class Bouquet(object):
@@ -10,14 +7,16 @@ class Bouquet(object):
         self.total_price = 0
         self.average_life_time = 0.0
 
+    def __getitem__(self, price):
+        return getattr(self, price)
 
     def add_flowers(self, *flowers):
             for flower in flowers:
                 if flower.is_broken == False:
                     self.flower_bouquet.append(flower)
 
-    def sorting_by_key(self):
-        bouquet.flower_bouquet.sort(key=attrgetter('price'), reverse=True)
+    # def sorting_by_key(self):
+    #     bouquet.flower_bouquet.sort(key=attrgetter('price'), reverse=True)
 
     def get_average_life_time(self):
         for flower in self.flower_bouquet:
@@ -73,14 +72,14 @@ bouquet.add_flowers(r, t, p)
 print(bouquet.get_total_price())
 print(bouquet.get_average_life_time())
 
-# bouquet.destruct_bouquet()
-# print(bouquet.search_by_key())
+bouquet.destruct_bouquet()
+
 print(bouquet.check_contains(p))
 
 b2 = Bouquet()
 p2 = Peonies('Purple', 30, 2, 3)
 b2.add_flowers(r, p2)
-bouquet.sorting_by_key()
+# bouquet.sorting_by_key()
 # print(bouquet.life_time)
 
 for i in bouquet.flower_bouquet:

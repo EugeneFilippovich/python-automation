@@ -19,7 +19,8 @@ TOTAL_CARS_COUNT = 100
 
 
 class CarFactory(object):
-    car_id = 1
+    car_id = 0
+    cars = []
 
     def __init__(self):
         print("Creating new car {}".format(id(self)))
@@ -51,6 +52,73 @@ class CarFactory(object):
     def info(self):
         print('mycar')
 
+    def create_cars(self, total_cars_count=100):
+        for i in xrange(0, total_cars_count):
+            gas_tank = 75 if CarFactory.car_id % 5 == 0 else 60
+            if CarFactory.car_id % 3 == 0:
+                self.add_car(DieselCarProduce(gas_tank))
+            else:
+                self.add_car(PetrolCarProduce(gas_tank))
+
+    def add_car(self, car):
+        self.cars.append(car)
+
+    def get_statistic(self):
+        for car in self.cars:
+            car.get_car_stats()
+
+    def get_car_stats(self):
+        print("Car's id: {}, total mileage: {}, final price: {}, money spent for fuel: {}, total gas gallons used: {}, "
+              "mileage before utilization: {} ".format(self.car_id, self._total_mileage, self.start_price,
+                                                       self.total_fuel_cost, self.gas_gallons_used,
+                                                       self.mileage_before_util))
+
+    total_credit_to_pay = 0
+
+    def drive_distance(self):
+        for car in self.cars:
+            remain_before_repair = car.mileage_before_repair
+
+            if isinstance(car, PetrolCarProduce):
+                repair_cost = CarServicePrice.PETROL_REPAIR_COST
+            elif isinstance(car, DieselCarProduce):
+                repair_cost = CarServicePrice.DIESEL_REPAIR_COST
+            else:
+                repair_cost = 0
+            for j in xrange(0, car.mileage_to_drive, CHECK_DISTANCE):
+                remain_to_drive = car.mileage_to_drive - car.total_mileage
+
+                DISTANCE = CHECK_DISTANCE if (remain_to_drive >= CHECK_DISTANCE) else remain_to_drive
+
+                if isinstance(car, PetrolCarProduce):
+                    car.change_petrol_price()
+
+                if remain_before_repair < DISTANCE:
+                    if (car.start_price - repair_cost) <= 0:
+                        continue
+                    car.start_price -= repair_cost
+                    car.repair_count += 1
+                    remain_before_repair = car.mileage_before_repair - (DISTANCE - remain_before_repair)
+                else:
+                    remain_before_repair -= DISTANCE
+
+                if car.start_price <= 0:
+                    car.start_price -= CarServicePrice.ENGINE_REPLACE
+                    car.total_credit += car.start_price
+                    break
+
+                car.mileage_increase(DISTANCE)
+                car.total_fuel += (DISTANCE * car.fuel_consumption / 100)
+                car.start_price -= (
+                    (car.fuel_consumption * FuelPrice.__dict__[car.fuel] * DISTANCE / 100) + car.reduce_price)
+                car.fuel_consumption += car.fuel_consumption * FUEL_CONSUMPTION_INCREASE
+                if car.start_price <= 0:
+                    car.total_credit += (car.start_price * (-1) + CarServicePrice.ENGINE_REPLACE)
+                self.total_credit_to_pay += car.total_credit
+                car.total_fuel_cost = car.total_fuel * FuelPrice.__dict__[car.fuel]
+                car.gas_gallons_used = car.total_fuel / car.gas_tank
+                car.mileage_before_util = car.start_price / FuelPrice.__dict__[car.fuel] if (car.start_price >= 0) else 0
+
 
 class PetrolCarProduce(CarFactory):
     def __init__(self, gas_tank=60):
@@ -77,74 +145,13 @@ class DieselCarProduce(CarFactory):
         self.reduce_price = 10.5
         self.fuel = 'DIESEL'
 
-cars = []
+car_produce = CarFactory()
+car_produce.create_cars(TOTAL_CARS_COUNT)
 
-for i in xrange(0, TOTAL_CARS_COUNT):
-    gas_tank = 75 if CarFactory.car_id % 5 == 0 else 60
-    if CarFactory.car_id % 3 == 0:
-        cars.append(DieselCarProduce(gas_tank))
-    else:
-        cars.append(PetrolCarProduce(gas_tank))
+car_produce.drive_distance()
 
-gallons = []
+cars = CarFactory.cars
 
-for i in xrange(0, TOTAL_CARS_COUNT):
-    gallons.append(cars[i].mileage_to_drive / (cars[i].fuel_consumption * cars[i].gas_tank))
-    cars[i].gas_gallons = gallons[i]
+car_produce.get_statistic()
 
-total_credit_to_pay = 0
-for i in xrange(0, len(cars)):
-    remain_before_repair = cars[i].mileage_before_repair
-
-    if isinstance(cars[i], PetrolCarProduce):
-        repair_cost = CarServicePrice.PETROL_REPAIR_COST
-    elif isinstance(cars[i], DieselCarProduce):
-        repair_cost = CarServicePrice.DIESEL_REPAIR_COST
-    else:
-        repair_cost = 0
-    for j in xrange(0, cars[i].mileage_to_drive, CHECK_DISTANCE):
-        remain_to_drive = cars[i].mileage_to_drive - cars[i].total_mileage
-
-        DISTANCE = CHECK_DISTANCE if (remain_to_drive >= CHECK_DISTANCE) else remain_to_drive
-
-        if isinstance(cars[i], PetrolCarProduce):
-            cars[i].change_petrol_price()
-
-        if remain_before_repair < DISTANCE:
-            if (cars[i].start_price - repair_cost) <= 0:
-                continue
-            cars[i].start_price -= repair_cost
-            cars[i].repair_count += 1
-            remain_before_repair = cars[i].mileage_before_repair - (DISTANCE - remain_before_repair)
-        else:
-            remain_before_repair -= DISTANCE
-
-        if cars[i].start_price <= 0:
-            cars[i].start_price -= CarServicePrice.ENGINE_REPLACE
-            cars[i].total_credit += cars[i].start_price
-            break
-
-        cars[i].mileage_increase(DISTANCE)
-        cars[i].total_fuel += (DISTANCE * cars[i].fuel_consumption / 100)
-        cars[i].start_price -= (
-        (cars[i].fuel_consumption * FuelPrice.__dict__[cars[i].fuel] * DISTANCE / 100) + cars[i].reduce_price)
-        cars[i].fuel_consumption += cars[i].fuel_consumption * FUEL_CONSUMPTION_INCREASE
-        if cars[i].start_price <= 0:
-            cars[i].total_credit += (cars[i].start_price * (-1) + CarServicePrice.ENGINE_REPLACE)
-        total_credit_to_pay += cars[i].total_credit
-        cars[i].total_fuel_cost = cars[i].total_fuel * FuelPrice.__dict__[cars[i].fuel]
-        cars[i].gas_gallons_used = cars[i].total_fuel / cars[i].gas_tank
-        cars[i].mileage_before_util = cars[i].start_price / FuelPrice.__dict__[cars[i].fuel] if (cars[i].start_price >= 0) else 0
-
-for i in xrange(0, TOTAL_CARS_COUNT):
-    print("Car's id: {}, total mileage: {}, final price: {}, money spent for fuel: {}, total gas gallons used: {}, "
-          "mileage before utilization: {} ".format(cars[i].car_id, cars[i]._total_mileage, cars[i].start_price,
-                                                   cars[i].total_fuel_cost, cars[i].gas_gallons_used,
-                                                   cars[i].mileage_before_util))
-    # print(cars[i].__dict__, "fuel price: " + str(FuelPrice.__dict__[cars[i].fuel]))
-
-print('Total credit to pay = ' + str(total_credit_to_pay))
-
-# car1 = CarProduce()
-#
-# car1.info()
+print('Total credit to pay = ' + str(car_produce.total_credit_to_pay))
