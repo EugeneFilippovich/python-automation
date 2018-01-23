@@ -167,7 +167,6 @@ s = GroceryStore()
 p = Pizza(6)
 p1 = Cheese(8)
 s.add_items(p, p1)
-s.delete_items(p, p1)
 
 # print (p.__dict__)
 
