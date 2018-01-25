@@ -2,7 +2,7 @@ import logging
 import paramiko
 import os
 
-USERNAME = 'eugene'
+# USERNAME = 'eugene'
 logging.basicConfig(level=logging.INFO)
 
 
@@ -39,7 +39,8 @@ for line in file:
     ssh.exec_command('chmod 600 ~/.ssh/authorized_keys')
     ssh.exec_command('chmod 700 ~/.ssh/')
     ssh.exec_command('ssh-keygen -t rsa -f ~/.ssh/id_rsa -q -P ""')
-    ssh.exec_command('cat ~/.ssh/id_rsa.pub | ssh root@192.168.56.103 %22cat >> ~/.ssh/authorized_keys%22')
+    ssh.exec_command('ssh-copy-id -i eugene@192.168.56.103 -p 4356')
+    # ssh.exec_command("cat ~/.ssh/id_rsa.pub | ssh eugene@192.168.56.103 'cat >> ~/.ssh/authorized_keys")
 
 
     # ftp_client = ssh.open_sftp()
