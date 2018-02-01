@@ -10,10 +10,10 @@ now = datetime.datetime.now()
 
 file = open('E:\creds.txt', 'r')
 
-for line in file:  # question #2
+for word in file:  # question #2
     creds = {}
-    creds['username'] = line.split(' ')[0]
-    creds['password'] = line.split(' ')[1]
+    creds['username'] = word.split(' ')[0]
+    creds['password'] = word.split(' ')[1]
 
 browser = webdriver.Chrome()
 browser.get("http://yahoo.com")
