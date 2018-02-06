@@ -2,6 +2,11 @@
 
 
 class SuppliesPrice(object):
+    LATTE = 5.2
+    CAPPUCCINO = 4.8
+    GINGER_TEA = 5.0
+    AMERICANO = 3.0
+    ESPRESSO = 2.8
     COFFEE = 2.4
     MILK = 1.4
     CREAM = 1.8
@@ -16,8 +21,22 @@ class SuppliesPrice(object):
     LIQUOR = 1.3
 
 
+class Beverage(object):
+    def __init__(self, beverage_type, extra_ingredients):
+        self.beverage_type = beverage_type
+        self.extra_ingredients = extra_ingredients
+        self.total_price = self.get_total_price()
+
+    def get_total_price(self):
+        total_price = 0
+        total_price += SuppliesPrice.__dict__[self.beverage_type]
+        for ingredient in self.extra_ingredients:
+            total_price += SuppliesPrice.__dict__[ingredient]
+        return total_price
+
+
 class SalesList(object):
-    list = []
+    list = {}
 
 
 class Employee(object):
@@ -45,42 +64,13 @@ class Manager(Employee):
 class Salesman(Employee):
     def __init__(self, first_name, second_name):
         super(Salesman, self).__init__(first_name, second_name, position='Salesman')
+        self.sales = []
 
-    @staticmethod
-    def make_latte(*args):
-        latte_price = format(SuppliesPrice.COFFEE + SuppliesPrice.MILK*2 + sum(args), '.2f')
-        SalesList.list.append(latte_price)
+    def make(self, beverage_type, extra_ingredients):
+        beverage = Beverage(beverage_type, extra_ingredients)
+        # self.sales.append(beverage)
+        SalesList.list.setdefault(self.first_name, []).append(beverage)
 
-    @staticmethod
-    def make_cappuccino(*args):
-        cappuccino_price = format(SuppliesPrice.COFFEE*2 + SuppliesPrice.MILK + sum(args), '.2f')
-        SalesList.list.append(cappuccino_price)
-
-    @staticmethod
-    def make_americano(*args):
-        americano_price = format(SuppliesPrice.COFFEE + sum(args), '.2f')
-        SalesList.list.append(americano_price)
-
-    @staticmethod
-    def make_raf(*args):
-        raf_price = format(SuppliesPrice.COFFEE + SuppliesPrice.MILK + SuppliesPrice.CREAM + SuppliesPrice.LIQUOR + sum(args), '.2f')
-        SalesList.list.append(raf_price)
-
-    @staticmethod
-    def make_ginger_tea(*args):
-        ginger_tea_price = format(SuppliesPrice.LEMON + SuppliesPrice.HONEY + SuppliesPrice.GINGER +
-                                  SuppliesPrice.ORANGE + SuppliesPrice.CINNAMON + SuppliesPrice.MINT + sum(args), '.2f')
-        SalesList.list.append(ginger_tea_price)
-
-    @staticmethod
-    def make_green_tea(*args):
-        green_tea_price = format(SuppliesPrice.GREEN_TEA + sum(args), '.2f')
-        SalesList.list.append(green_tea_price)
-
-    @staticmethod
-    def make_black_tea(*args):
-        black_tea_price = format(SuppliesPrice.BLACK_TEA + sum(args), '.2f')
-        SalesList.list.append(black_tea_price)
 
     # @staticmethod
     # def save_detailed_bill():
@@ -91,18 +81,28 @@ class Salesman(Employee):
 manager = Manager('John', 'Snow')
 salesman = Salesman('Ramsay', 'Bolton')
 
-print(manager.view_personal_info())
-print(salesman.view_personal_info())
+# print(manager.view_personal_info())
+# print(salesman.view_personal_info())
+#
+# Salesman.make_latte()
+# Salesman.make_cappuccino()
+# Salesman.make_americano()
+# Salesman.make_raf()
+# Salesman.make_ginger_tea()
+# Salesman.make_green_tea()
+# Salesman.make_black_tea()
+#
+#
+# # Salesman.save_detailed_bill()
+# print(SalesList.list)
+# Manager.show_summary()
 
-Salesman.make_latte()
-Salesman.make_cappuccino()
-Salesman.make_americano()
-Salesman.make_raf()
-Salesman.make_ginger_tea()
-Salesman.make_green_tea()
-Salesman.make_black_tea()
 
+salesman.make('LATTE', [])
+salesman.make('GREEN_TEA', ['MILK', "GINGER"])
 
-# Salesman.save_detailed_bill()
-print(SalesList.list)
-Manager.show_summary()
+print(SalesList.list.items())
+for k in SalesList.list:
+    print(k)
+    for _ in SalesList.list[k]:
+        print(_.__dict__['beverage_type'])
