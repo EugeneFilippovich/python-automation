@@ -1,4 +1,6 @@
-# detailed_bill_file = open('E:/detailed.txt', 'w')
+import operator
+from datetime import datetime
+import time
 
 
 class SuppliesPrice(object):
@@ -7,13 +9,13 @@ class SuppliesPrice(object):
     GINGER_TEA = 5.0
     AMERICANO = 3.0
     ESPRESSO = 2.8
+    BLACK_TEA = 2
+    GREEN_TEA = 1.8
     COFFEE = 2.4
     MILK = 1.4
     CREAM = 1.8
     HONEY = 1.6
     CINNAMON = 0.4
-    BLACK_TEA = 2
-    GREEN_TEA = 1.8
     GINGER = 1.0
     LEMON = 0.5
     MINT = 0.3
@@ -56,9 +58,12 @@ class Manager(Employee):
     @staticmethod
     def show_summary():
         total = 0
-        for i in range(len(SalesList.list)):
-            total += i
+        for key in SalesList.list.keys():
+            sales = SalesList.list[key]
+            for sale in sales:
+                total = total + sale.__dict__['total_price']
         print(total)
+        return total
 
 
 class Salesman(Employee):
@@ -68,18 +73,30 @@ class Salesman(Employee):
 
     def make(self, beverage_type, extra_ingredients):
         beverage = Beverage(beverage_type, extra_ingredients)
-        # self.sales.append(beverage)
         SalesList.list.setdefault(self.first_name, []).append(beverage)
+        self.save_detailed_bill(beverage)
+        oop = str(datetime.now().strftime("%d-%m-%Y_%H-%M-%S"))
+        separate_bill_file = open('E:/test/' + self.first_name + ' ' + self.second_name + '_bill_' + oop + '.txt', 'a')
+        separate_bill_file.write(
+            "%s\t %s\t %s\n " % (datetime.now().strftime("%d-%m-%Y %H:%M"), self.first_name, beverage.__dict__))
+        time.sleep(1)
+        separate_bill_file.close()
 
+    @staticmethod
+    def get_beverage_price(beverage_type, extra_ingredients):
+        beverage_price = Beverage(beverage_type, extra_ingredients)
+        print(beverage_price.__dict__)
 
-    # @staticmethod
-    # def save_detailed_bill():
-    #     for item in SalesList.list:
-    #         detailed_bill_file.write("%s\n" % item)
-    #     detailed_bill_file.close()
+    def save_detailed_bill(self, beverage):
+        detailed_bill_file = open('E:/detailed.txt', 'a')
+        detailed_bill_file.write(
+            "%s\t %s\t %s\n " % (datetime.now().strftime("%d-%m-%Y %H:%M"), self.first_name, beverage.__dict__))
+        detailed_bill_file.close()
 
 manager = Manager('John', 'Snow')
+
 salesman = Salesman('Ramsay', 'Bolton')
+salesman2 = Salesman('Mana', 'Banana')
 
 # print(manager.view_personal_info())
 # print(salesman.view_personal_info())
@@ -100,9 +117,15 @@ salesman = Salesman('Ramsay', 'Bolton')
 
 salesman.make('LATTE', [])
 salesman.make('GREEN_TEA', ['MILK', "GINGER"])
+salesman2.make('GREEN_TEA', ['MILK', "GINGER"])
+salesman2.make('GREEN_TEA', ['MILK', "GINGER"])
 
 print(SalesList.list.items())
 for k in SalesList.list:
     print(k)
     for _ in SalesList.list[k]:
-        print(_.__dict__['beverage_type'])
+        print(_.__dict__)
+
+manager.show_summary()
+
+salesman2.get_beverage_price('GREEN_TEA', ['MILK'])
