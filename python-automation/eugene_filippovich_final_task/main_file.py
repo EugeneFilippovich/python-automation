@@ -57,13 +57,12 @@ class Manager(Employee):
 
     @staticmethod
     def show_summary():
-
         for key in SalesList.list.keys():
             sales = SalesList.list[key]
             total = 0
             for sale in sales:
                 total = total + sale.__dict__['total_price']
-            print(key + ' ' + str(len(sales)) + ' ' + str(total))
+            print(key + ' ' + str(len(sales)) + ' ' + str(round(total, 2)))
 
 
 class Salesman(Employee):
@@ -75,7 +74,7 @@ class Salesman(Employee):
         beverage = Beverage(beverage_type, extra_ingredients)
         SalesList.list.setdefault(self.first_name, []).append(beverage)
         self.save_detailed_bill(beverage)
-        oop = str(datetime.now().strftime("%d-%m-%Y_%H-%M-%S.%f")[:-3])
+        oop = str(datetime.now().strftime("%d-%m-%Y_%H-%M-%S--%f")[:-3])
         separate_bill_file = open('E:/test/' + self.first_name + ' ' + self.second_name + '_bill_' + oop + '.txt', 'a')
         separate_bill_file.write(
             "%s\t %s\t %s\n " % (datetime.now().strftime("%d-%m-%Y %H:%M"), self.first_name, beverage.__dict__))
@@ -116,10 +115,9 @@ salesman2 = Salesman('Mana', 'Banana')
 
 
 salesman.make('LATTE', [])
-salesman.make('GREEN_TEA', ['MILK', "GINGER"])
+
 salesman2.make('GREEN_TEA', ['MILK', "GINGER"])
-salesman2.make('GREEN_TEA', ['MILK', "GINGER"])
-salesman2.make('GREEN_TEA', ['MILK', "GINGER"])
+
 
 print(SalesList.list.items())
 for k in SalesList.list:
