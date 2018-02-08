@@ -6,6 +6,16 @@ import sqlite3
 connection = sqlite3.connect('C:/sqlite/users.db')
 cursor = connection.cursor()
 
+# cursor.execute("""CREATE TABLE employees (
+#                   first text,
+#                   last text,
+#                   position text
+#                   )""")
+
+connection.commit()
+
+connection.close()
+
 
 class SuppliesPrice(object):
     LATTE = 5.2
