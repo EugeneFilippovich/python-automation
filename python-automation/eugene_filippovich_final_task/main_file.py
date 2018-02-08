@@ -1,6 +1,10 @@
-import operator
 from datetime import datetime
 import time
+import argparse
+import sqlite3
+
+connection = sqlite3.connect('C:/sqlite/users.db')
+cursor = connection.cursor()
 
 
 class SuppliesPrice(object):
@@ -21,7 +25,7 @@ class SuppliesPrice(object):
     MINT = 0.3
     ORANGE = 0.4
     LIQUOR = 1.3
-
+    NONE = 0
 
 class Beverage(object):
     def __init__(self, beverage_type, extra_ingredients):
@@ -92,10 +96,53 @@ class Salesman(Employee):
             "%s\t %s\t %s\n " % (datetime.now().strftime("%d-%m-%Y %H:%M"), self.first_name, beverage.__dict__))
         detailed_bill_file.close()
 
-manager = Manager('John', 'Snow')
+parser = argparse.ArgumentParser()
+parser.add_argument('position', help='Login please', type=str)
+parser.add_argument('action', help='Choose an action', type=str)
+args = parser.parse_args()
 
-salesman = Salesman('Ramsay', 'Bolton')
-salesman2 = Salesman('Mana', 'Banana')
+# position = ('manager' )#args.position
+# action = ('make_beverage') #args.action
+# status = ('yes')
+
+while True:
+    if args.position == 'manager' and args.action == 'show_summary':
+        manager = Manager('John', 'Snow')
+        manager.show_summary()
+        print(manager.first_name, manager.second_name)
+
+    # elif args.position == 'manager' and args.action == ''
+
+    elif args.position == 'salesman' and args.action == 'make_beverage':
+        while True:
+            salesman = Salesman('Ramsay', 'Bolton')
+            print('Logged as Salesman')
+            try:
+                beverage_type1 = input()
+                extra_ingredients1 = input()
+                print(beverage_type1)
+                salesman.make(beverage_type1, [extra_ingredients1])
+            except SyntaxError:
+                beverage_type1 = None
+            if beverage_type1 is None:
+                break
+
+    try:
+        status = input('Continue? ')
+        print(status)
+        args.position = input('position ')
+        print(args.position)
+        args.action = input('action ')
+        print(args.action)
+    except SyntaxError:
+        status = None
+    if status is None or status == '':
+        break
+
+
+
+
+
 
 # print(manager.view_personal_info())
 # print(salesman.view_personal_info())
@@ -114,17 +161,17 @@ salesman2 = Salesman('Mana', 'Banana')
 # Manager.show_summary()
 
 
-salesman.make('LATTE', [])
+# salesman.make('LATTE', [])
+# salesman.make('LATTE', ['COFFEE', 'HONEY'])
 
-salesman2.make('GREEN_TEA', ['MILK', "GINGER"])
 
 
-print(SalesList.list.items())
-for k in SalesList.list:
-    print(k)
-    for _ in SalesList.list[k]:
-        print(_.__dict__)
+# print(SalesList.list.items())
+# for k in SalesList.list:
+#     print(k)
+#     for _ in SalesList.list[k]:
+#         print(_.__dict__)
 
-manager.show_summary()
+# manager.show_summary()
 
-salesman2.get_beverage_price('GREEN_TEA', ['MILK'])
+
