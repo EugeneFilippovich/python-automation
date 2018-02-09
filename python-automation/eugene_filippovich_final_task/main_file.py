@@ -3,18 +3,20 @@ import time
 import argparse
 import sqlite3
 
-connection = sqlite3.connect('C:/sqlite/users.db')
+connection = sqlite3.connect("C:/sqlite/users.db")
 cursor = connection.cursor()
 
-# cursor.execute("""CREATE TABLE employees (
-#                   first text,
-#                   last text,
-#                   position text
-#                   )""")
+cursor.execute("""CREATE TABLE IF NOT EXISTS employees (
+                  id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  first TEXT,
+                  last TEXT,
+                  position INTEGER,
+                  beverage_type TEXT,
+                  extra_ingredients TEXT,
+                  beverage_price INTEGER 
+                  )""")
 
-connection.commit()
 
-connection.close()
 
 
 class SuppliesPrice(object):
@@ -36,6 +38,7 @@ class SuppliesPrice(object):
     ORANGE = 0.4
     LIQUOR = 1.3
     NONE = 0
+
 
 class Beverage(object):
     def __init__(self, beverage_type, extra_ingredients):
@@ -94,6 +97,8 @@ class Salesman(Employee):
             "%s\t %s\t %s\n " % (datetime.now().strftime("%d-%m-%Y %H:%M"), self.first_name, beverage.__dict__))
         # time.sleep(1)
         separate_bill_file.close()
+        # cursor.execute("INSERT INTO employees (beverage_type) (?)", beverage_type)
+
 
     @staticmethod
     def get_beverage_price(beverage_type, extra_ingredients):
@@ -111,46 +116,32 @@ parser.add_argument('position', help='Login please', type=str)
 parser.add_argument('action', help='Choose an action', type=str)
 args = parser.parse_args()
 
-# position = ('manager' )#args.position
-# action = ('make_beverage') #args.action
-# status = ('yes')
 
-while True:
-    if args.position == 'manager' and args.action == 'show_summary':
-        manager = Manager('John', 'Snow')
-        manager.show_summary()
-        print(manager.first_name, manager.second_name)
+if args.position == 'manager' and args.action == 'show_summary':
+    manager = Manager('John', 'Snow')
+    manager.show_summary()
+    print(manager.first_name, manager.second_name)
 
-    # elif args.position == 'manager' and args.action == ''
+elif args.position == 'salesman' and args.action == 'make_beverage':
+    while True:
+        salesman = Salesman('Ramsay', 'Bolton')
+        print('Logged as Salesman')
+        try:
+            beverage_type1 = input()
+            extra_ingredients1 = input()
+            print(beverage_type1 + extra_ingredients1)
+            salesman.make(beverage_type1, [extra_ingredients1])
+        except SyntaxError:
+            beverage_type1 = None
+        if beverage_type1 is None:
+            break
 
-    elif args.position == 'salesman' and args.action == 'make_beverage':
-        while True:
-            salesman = Salesman('Ramsay', 'Bolton')
-            print('Logged as Salesman')
-            try:
-                beverage_type1 = input()
-                extra_ingredients1 = input()
-                print(beverage_type1)
-                salesman.make(beverage_type1, [extra_ingredients1])
-            except SyntaxError:
-                beverage_type1 = None
-            if beverage_type1 is None:
-                break
+# for _ in SalesList.list:
+#     cursor.execute('INSERT INTO employees values (?,?,?,?,?)', _)
 
-    try:
-        status = input('Continue? ')
-        print(status)
-        args.position = input('position ')
-        print(args.position)
-        args.action = input('action ')
-        print(args.action)
-    except SyntaxError:
-        status = None
-    if status is None or status == '':
-        break
+connection.commit()
 
-
-
+connection.close()
 
 
 
@@ -176,11 +167,11 @@ while True:
 
 
 
-# print(SalesList.list.items())
-# for k in SalesList.list:
-#     print(k)
-#     for _ in SalesList.list[k]:
-#         print(_.__dict__)
+print(SalesList.list.items())
+for k in SalesList.list:
+    print(k)
+    for _ in SalesList.list[k]:
+        print(_.__dict__)
 
 # manager.show_summary()
 
