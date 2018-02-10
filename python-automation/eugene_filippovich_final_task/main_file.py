@@ -8,9 +8,8 @@ cursor = connection.cursor()
 
 cursor.execute("""CREATE TABLE IF NOT EXISTS employees (
                   id INTEGER PRIMARY KEY AUTOINCREMENT,
-                  first TEXT,
-                  last TEXT,
-                  position INTEGER,
+                  first_name TEXT,
+                  last_name TEXT,
                   beverage_type TEXT,
                   extra_ingredients TEXT,
                   beverage_price INTEGER 
@@ -61,11 +60,11 @@ class SalesList(object):
 class Employee(object):
     def __init__(self, first_name, second_name, position):
         self.first_name = first_name
-        self.second_name = second_name
+        self.last_name = second_name
         self.position = position
 
     def view_personal_info(self):
-        return self.first_name, self.second_name, self.position
+        return self.first_name, self.last_name, self.position
 
 
 class Manager(Employee):
@@ -92,12 +91,13 @@ class Salesman(Employee):
         SalesList.list.setdefault(self.first_name, []).append(beverage)
         self.save_detailed_bill(beverage)
         oop = str(datetime.now().strftime("%d-%m-%Y_%H-%M-%S--%f")[:-3])
-        separate_bill_file = open('E:/test/' + self.first_name + ' ' + self.second_name + '_bill_' + oop + '.txt', 'a')
+        separate_bill_file = open('E:/test/' + self.first_name + ' ' + self.last_name + '_bill_' + oop + '.txt', 'a')
         separate_bill_file.write(
             "%s\t %s\t %s\n " % (datetime.now().strftime("%d-%m-%Y %H:%M"), self.first_name, beverage.__dict__))
-        # time.sleep(1)
         separate_bill_file.close()
-        # cursor.execute("INSERT INTO employees (beverage_type) (?)", beverage_type)
+        cursor.execute("INSERT INTO employees (beverage_type, extra_ingredients, beverage_price, first_name, last_name) VALUES (?, ?, ?, ?, ?)", [beverage_type1, extra_ingredients1, round(beverage.__dict__['total_price'], 2), self.first_name, self.last_name])
+
+
 
 
     @staticmethod
@@ -111,6 +111,7 @@ class Salesman(Employee):
             "%s\t %s\t %s\n " % (datetime.now().strftime("%d-%m-%Y %H:%M"), self.first_name, beverage.__dict__))
         detailed_bill_file.close()
 
+
 parser = argparse.ArgumentParser()
 parser.add_argument('position', help='Login please', type=str)
 parser.add_argument('action', help='Choose an action', type=str)
@@ -120,7 +121,7 @@ args = parser.parse_args()
 if args.position == 'manager' and args.action == 'show_summary':
     manager = Manager('John', 'Snow')
     manager.show_summary()
-    print(manager.first_name, manager.second_name)
+    print(manager.first_name, manager.last_name)
 
 elif args.position == 'salesman' and args.action == 'make_beverage':
     while True:
@@ -129,18 +130,16 @@ elif args.position == 'salesman' and args.action == 'make_beverage':
         try:
             beverage_type1 = input()
             extra_ingredients1 = input()
-            print(beverage_type1 + extra_ingredients1)
+            print(beverage_type1 + ' ' + extra_ingredients1)
             salesman.make(beverage_type1, [extra_ingredients1])
+            # salesman.sql_commit()
         except SyntaxError:
             beverage_type1 = None
         if beverage_type1 is None:
             break
 
-# for _ in SalesList.list:
-#     cursor.execute('INSERT INTO employees values (?,?,?,?,?)', _)
 
 connection.commit()
-
 connection.close()
 
 
@@ -166,13 +165,11 @@ connection.close()
 # salesman.make('LATTE', ['COFFEE', 'HONEY'])
 
 
-
-print(SalesList.list.items())
-for k in SalesList.list:
-    print(k)
-    for _ in SalesList.list[k]:
-        print(_.__dict__)
+# print(SalesList.list.items())
+# for k in SalesList.list:
+#     print(k)
+#     for _ in SalesList.list[k]:
+#         print(_.__dict__)
 
 # manager.show_summary()
-
 
