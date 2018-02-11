@@ -1,15 +1,14 @@
-import unittest
+import logging
+import sys
 
+file_handler = logging.FileHandler(filename='tmp.log')
+stdout_handler = logging.StreamHandler(sys.stdout)
+handlers = [file_handler, stdout_handler]
 
-class WidgetTestCase(unittest.TestCase):
-    def setUp(self):
-        self.widget = Widget('The widget')
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s',
+    handlers=handlers
+)
 
-    def test_default_widget_size(self):
-        self.assertEqual(self.widget.size(), (50, 50),
-                         'incorrect default size')
-
-    def test_widget_resize(self):
-        self.widget.resize(100, 150)
-        self.assertEqual(self.widget.size(), (100, 150),
-                         'wrong size after resize')
+logger = logging.getLogger('LOGGER_NAME')
