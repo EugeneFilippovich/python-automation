@@ -8,6 +8,7 @@ cursor = connection.cursor()
 
 cursor.execute("""CREATE TABLE IF NOT EXISTS employees (
                   id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  sale_quantity INTEGER DEFAULT 1,
                   first_name TEXT,
                   last_name TEXT,
                   beverage_type TEXT,
@@ -97,9 +98,6 @@ class Salesman(Employee):
         separate_bill_file.close()
         cursor.execute("INSERT INTO employees (beverage_type, extra_ingredients, beverage_price, first_name, last_name) VALUES (?, ?, ?, ?, ?)", [beverage_type1, extra_ingredients1, round(beverage.__dict__['total_price'], 2), self.first_name, self.last_name])
 
-
-
-
     @staticmethod
     def get_beverage_price(beverage_type, extra_ingredients):
         beverage_price = Beverage(beverage_type, extra_ingredients)
@@ -117,27 +115,71 @@ parser.add_argument('position', help='Login please', type=str)
 parser.add_argument('action', help='Choose an action', type=str)
 args = parser.parse_args()
 
-
-if args.position == 'manager' and args.action == 'show_summary':
+# SVETOCHKA HELP
+if args.position == 'John' and args.action == 'show_summary':
     manager = Manager('John', 'Snow')
     manager.show_summary()
-    print(manager.first_name, manager.last_name)
+    print("Logged as " + manager.first_name + " " + manager.last_name)
+    cursor.execute("SELECT (first_name) from employees where first_name = 'Hodor'")
+    seller1_first_name = cursor.fetchone()
+    cursor.execute("SELECT sum(beverage_price) from employees where first_name = 'Hodor'")
+    seller1_total_beverage_price = cursor.fetchone()
+    cursor.execute("SELECT sum(sale_quantity) from employees where first_name = 'Hodor'")
+    seller1_total_sales = cursor.fetchone()
 
-elif args.position == 'salesman' and args.action == 'make_beverage':
+    cursor.execute("SELECT (first_name) from employees where first_name = 'Tyrion'")
+    seller2_first_name = cursor.fetchone()
+    cursor.execute("SELECT sum(beverage_price) from employees where first_name = 'Tyrion'")
+    seller2_total_beverage_price = cursor.fetchone()
+    cursor.execute("SELECT sum(sale_quantity) from employees where first_name = 'Tyrion'")
+    seller2_total_sales = cursor.fetchone()
+
+    cursor.execute("SELECT sum(sale_quantity) from employees")
+    sellers_summary_sales = cursor.fetchone()
+    cursor.execute("SELECT sum(beverage_price) from employees")
+    sellers_summary_price = cursor.fetchone()
+    print('Seller name \t | \t Number of sales \t | \t Total Value ($) \n'
+          '{0} \t | \t \t {1} \t \t | \t {2} \n'
+          '{3} \t | \t \t {4} \t \t | \t {5} \n'
+          '{6} \t \t | \t \t {7} \t \t | \t {8}'
+          .format(seller1_first_name, seller1_total_sales, seller1_total_beverage_price, seller2_first_name,
+                  seller2_total_sales, seller2_total_beverage_price, "Total:", sellers_summary_sales, sellers_summary_price))
+
+
+elif args.position == 'Tyrion' and args.action == 'make_beverage':
     while True:
-        salesman = Salesman('Ramsay', 'Bolton')
-        print('Logged as Salesman')
+        salesman = Salesman('Tyrion', 'Lannister')
+        print("Logged as " + salesman.first_name + " " + salesman.last_name)
         try:
             beverage_type1 = input()
             extra_ingredients1 = input()
-            print(beverage_type1 + ' ' + extra_ingredients1)
+            print("You made: " + beverage_type1 + ' ' + extra_ingredients1)
             salesman.make(beverage_type1, [extra_ingredients1])
-            # salesman.sql_commit()
         except SyntaxError:
             beverage_type1 = None
         if beverage_type1 is None:
             break
 
+elif args.position == 'Hodor' and args.action == 'Hodor':
+    while True:
+        salesman = Salesman('Hodor', 'Hodor')
+        print('Hodor Hodor Hodor')
+        try:
+            beverage_type1 = input()
+            extra_ingredients1 = input()
+            print("You made: " + beverage_type1 + ' ' + extra_ingredients1)
+            salesman.make(beverage_type1, [extra_ingredients1])
+        except SyntaxError:
+            beverage_type1 = None
+        if beverage_type1 is None:
+            break
+
+# SVETOCHKA HELP
+# elif args.position == 'Tyrion' and args.action == 'get_price':
+    # salesman = Salesman('Get', 'Price')
+    # beverage_type2 = input()
+    # extra_ingredients2 = input()
+    # salesman.get_beverage_price('COFFEE', 'COFFEE')
 
 connection.commit()
 connection.close()
