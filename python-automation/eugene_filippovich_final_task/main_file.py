@@ -3,13 +3,15 @@ import argparse
 import sqlite3
 import logging
 import sys
+from logging.handlers import RotatingFileHandler
+from xlsxwriter.workbook import Workbook
 
 # File and stdout loggers declaration
+LOG_FILENAME = "E:\logging\logs.txt"
 logger = logging.getLogger()
 logging.basicConfig(level=logging.INFO)
-LOG_FILENAME = "E:\logging\logs.txt"
-file_handler = logging.FileHandler(filename=LOG_FILENAME)
-file_handler.setLevel(logging.INFO)
+file_handler = RotatingFileHandler(filename=LOG_FILENAME, maxBytes=2048, backupCount=10)
+file_handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter('\n %(asctime)s - %(name)s - %(levelname)s - %(message)s')
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
@@ -95,7 +97,16 @@ class Manager(Employee):
             for sale in sales:
                 total = total + sale.__dict__['total_price']
             print(key + ' ' + str(len(sales)) + ' ' + str(round(total, 2)))
-
+    # Export database to the .xls file
+    @staticmethod
+    def export_xls():
+        workbook = Workbook('E:\logging\output2.xlsx')
+        worksheet = workbook.add_worksheet()
+        mysel = cursor.execute("SELECT * FROM employees")
+        for i, row in enumerate(mysel):
+            for j, value in enumerate(row):
+                worksheet.write(i, j, row[j])
+        workbook.close()
 
 class Salesman(Employee):
     def __init__(self, first_name, second_name):
@@ -110,7 +121,7 @@ class Salesman(Employee):
         SalesList.list.setdefault(self.first_name, []).append(beverage)
         self.save_detailed_bill(beverage)
         oop = str(datetime.now().strftime("%d-%m-%Y_%H-%M-%S--%f")[:-3])
-        #saving every operation into separate file
+        # saving every operation into separate file
         separate_bill_file = open('E:/test/' + self.first_name + ' ' + self.last_name + '_bill_' + oop + '.txt', 'a')
         separate_bill_file.write(
             "%s\t %s\t %s\n " % (datetime.now().strftime("%d-%m-%Y %H:%M"), self.first_name, beverage.__dict__))
@@ -131,16 +142,18 @@ class Salesman(Employee):
             "%s\t %s\t %s\n " % (datetime.now().strftime("%d-%m-%Y %H:%M"), self.first_name, beverage.__dict__))
         detailed_bill_file.close()
 
-# Adding argparse for CMD
+# Adding argparse for command line
 parser = argparse.ArgumentParser()
 parser.add_argument('position', help='Login please', type=str)
 parser.add_argument('action', help='Choose an action', type=str)
 args = parser.parse_args()
 
+
 if args.position == 'John' and args.action == 'show_summary':
     manager = Manager('John', 'Snow')
     manager.show_summary()
-    print("Logged as " + manager.first_name + " " + manager.last_name)
+    logging.info("Logged as " + manager.first_name + " " + manager.last_name)
+
     cursor.execute("SELECT (first_name) from employees where first_name = 'Hodor'")
     seller1_first_name = cursor.fetchone()
     cursor.execute("SELECT sum(beverage_price) from employees where first_name = 'Hodor'")
@@ -166,72 +179,55 @@ if args.position == 'John' and args.action == 'show_summary':
                   .format(seller1_first_name, seller1_total_sales, seller1_total_beverage_price, seller2_first_name,
                           seller2_total_sales, seller2_total_beverage_price, "Total:", sellers_summary_sales, sellers_summary_price))
 
+elif args.position == 'John' and args.action == 'export_xls':
+    manager = Manager('John', 'Snow')
+    manager.export_xls()
 
 elif args.position == 'Tyrion' and args.action == 'make_beverage':
     while True:
         salesman = Salesman('Tyrion', 'Lannister')
-        print("Logged as " + salesman.first_name + " " + salesman.last_name)
+        logging.info("Logged as " + salesman.first_name + " " + salesman.last_name)
         try:
-            beverage_type1 = input()
-            extra_ingredients1 = input()
-            print("You made: " + beverage_type1 + ' ' + extra_ingredients1)
+            beverage_type1 = input().upper()
+            extra_ingredients1 = input().upper()
+            logging.info("{} {} made {} with {}".format(salesman.first_name, salesman.last_name, beverage_type1, extra_ingredients1))
             salesman.make(beverage_type1, [extra_ingredients1])
-        except SyntaxError:
+        except NameError:
             beverage_type1 = None
+            logging.info('User {} inputted inputted invalid values'.format([salesman.first_name, salesman.last_name]))
         if beverage_type1 is None:
             break
 
 elif args.position == 'Hodor' and args.action == 'Hodor':
     while True:
         salesman = Salesman('Hodor', 'Hodor')
-        print('Hodor Hodor Hodor')
+        logging.info('Hodor Hodor Hodor logged')
         try:
-            beverage_type1 = input()
-            extra_ingredients1 = input()
-            print("You made: " + beverage_type1 + ' ' + extra_ingredients1)
+            beverage_type1 = input().upper()
+            extra_ingredients1 = input().upper()
             salesman.make(beverage_type1, [extra_ingredients1])
-        except SyntaxError:
+            logging.info("{} {} made {} with {}".format(salesman.first_name, salesman.last_name, beverage_type1, extra_ingredients1))
+        except NameError:
             beverage_type1 = None
-        if beverage_type1 is None:
-            break
+            logging.info('User {} inputted invalid values'.format([salesman.first_name, salesman.last_name]))
 
 elif args.position == 'Tyrion' and args.action == 'get_price':
-    salesman = Salesman('Get', 'Price')
-    beverage_type2 = input()
-    extra_ingredients2 = input()
-    salesman.get_beverage_price(beverage_type2, [extra_ingredients2])
+    while True:
+        salesman = Salesman('Get', 'Price')
+        try:
+            beverage_type2 = input().upper()
+            extra_ingredients2 = input().upper()
+            salesman.get_beverage_price(beverage_type2, [extra_ingredients2])
+            logging.info('User {} requested for total price of {} with {}'.format([salesman.first_name, salesman.last_name],
+                                                                                  beverage_type2, extra_ingredients2))
+        except NameError:
+            beverage_type2 = None
+            logging.info('User {} inputted inputted invalid values'.format([salesman.first_name, salesman.last_name]))
+        if beverage_type2 is None:
+            break
 
 connection.commit()
 connection.close()
 
 
-
-# print(manager.view_personal_info())
-# print(salesman.view_personal_info())
-#
-# Salesman.make_latte()
-# Salesman.make_cappuccino()
-# Salesman.make_americano()
-# Salesman.make_raf()
-# Salesman.make_ginger_tea()
-# Salesman.make_green_tea()
-# Salesman.make_black_tea()
-#
-#
-# # Salesman.save_detailed_bill()
-# print(SalesList.list)
-# Manager.show_summary()
-
-
-# salesman.make('LATTE', [])
-# salesman.make('LATTE', ['COFFEE', 'HONEY'])
-
-
-# print(SalesList.list.items())
-# for k in SalesList.list:
-#     print(k)
-#     for _ in SalesList.list[k]:
-#         print(_.__dict__)
-
-# manager.show_summary()
 
